@@ -1,3 +1,4 @@
+// /components/Sidebar.js 
 "use client"; // Mark as Client Component since it handles interactivity
 
 import { useState } from 'react';

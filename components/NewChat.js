@@ -1,3 +1,4 @@
+// /components/NewChat.js 
 "use client"; // Ensure this component is treated as a Client Component
 
 import React from 'react';
