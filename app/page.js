@@ -4,7 +4,6 @@ import Sidebar from '../components/Sidebar';
 import ChatWindow from '../components/ChatWindow';
 
 export default function Home() {
-  // State to manage chat sessions and active session
   const [chatSessions, setChatSessions] = useState([
     { id: 1, title: 'Session 1', messages: [] },
     { id: 2, title: 'Session 2', messages: [] },
@@ -14,7 +13,7 @@ export default function Home() {
   ]);
   const [activeSessionId, setActiveSessionId] = useState(chatSessions[0].id);
 
-  const handleSend = (message) => {
+  const handleSend = async (message) => {
     setChatSessions(chatSessions.map(session => {
       if (session.id === activeSessionId) {
         return {
@@ -24,6 +23,40 @@ export default function Home() {
       }
       return session;
     }));
+
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages: [
+            { role: 'system', content: 'You are a helpful assistant.' },
+            { role: 'user', content: message }
+          ],
+          temperature: 0.7,
+          max_tokens: 100,
+        }),
+      });
+
+      const data = await response.json();
+      const aiMessage = data.message;
+
+      setChatSessions(chatSessions.map(session => {
+        if (session.id === activeSessionId) {
+          return {
+            ...session,
+            messages: [...session.messages, { id: Date.now(), type: 'received', text: aiMessage }]
+          };
+        }
+        return session;
+      }));
+
+    } catch (error) {
+      console.error('Error sending message to AI:', error);
+    }
   };
 
   const handleNewChat = () => {
