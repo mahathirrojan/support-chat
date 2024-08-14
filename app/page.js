@@ -14,7 +14,7 @@ export default function Home() {
   const [activeSessionId, setActiveSessionId] = useState(chatSessions[0].id);
 
   const handleSend = async (message) => {
-    setChatSessions(chatSessions.map(session => {
+    const updatedSessions = chatSessions.map(session => {
       if (session.id === activeSessionId) {
         return {
           ...session,
@@ -22,7 +22,8 @@ export default function Home() {
         };
       }
       return session;
-    }));
+    });
+    setChatSessions(updatedSessions);
 
     try {
       const response = await fetch('/api/chat', {
@@ -44,7 +45,8 @@ export default function Home() {
       const data = await response.json();
       const aiMessage = data.message;
 
-      setChatSessions(chatSessions.map(session => {
+      // Add AI's response to the same session's messages
+      const updatedSessionsWithAI = updatedSessions.map(session => {
         if (session.id === activeSessionId) {
           return {
             ...session,
@@ -52,7 +54,8 @@ export default function Home() {
           };
         }
         return session;
-      }));
+      });
+      setChatSessions(updatedSessionsWithAI);
 
     } catch (error) {
       console.error('Error sending message to AI:', error);
